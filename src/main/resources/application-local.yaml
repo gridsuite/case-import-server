@@ -1,0 +1,12 @@
+server:
+  port: 5039
+
+powsybl:
+  services:
+    case-server:
+      base-uri: http://localhost:5000
+
+gridsuite:
+  services:
+    directory-server:
+      base-uri: http://localhost:5026

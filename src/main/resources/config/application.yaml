@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: case-import-server
+
+target-directory-name: CVG/Recollement
