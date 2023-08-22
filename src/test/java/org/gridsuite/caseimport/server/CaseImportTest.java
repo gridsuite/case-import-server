@@ -7,7 +7,8 @@
 package org.gridsuite.caseimport.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import org.gridsuite.caseimport.server.utils.WireMockUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,17 +25,10 @@ import org.springframework.util.ResourceUtils;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
 
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import okhttp3.HttpUrl;
-import okhttp3.mockwebserver.Dispatcher;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
-import okio.Buffer;
 
 /**
  * @author Abdelsalem Hedhili <abdelsalem.hedhili at rte-france.com>
@@ -49,6 +43,10 @@ public class CaseImportTest {
     private static final String TEST_INCORRECT_FILE = "application-default.yml";
     private static final String USER1 = "user1";
 
+    private WireMockServer wireMockServer;
+
+    private WireMockUtils wireMockUtils;
+
     @Autowired
     ObjectMapper objectMapper;
     @Autowired
@@ -60,45 +58,20 @@ public class CaseImportTest {
 
     @Before
     public void setup() throws IOException {
-        MockWebServer server = new MockWebServer();
+        wireMockServer = new WireMockServer(wireMockConfig().dynamicPort());
+        wireMockUtils = new WireMockUtils(wireMockServer);
 
         // Start the server.
-        server.start();
+        wireMockServer.start();
 
-        // Ask the server for its URL. You'll need this to make HTTP requests.
-        HttpUrl baseHttpUrl = server.url("");
-        String baseUrl = baseHttpUrl.toString().substring(0, baseHttpUrl.toString().length() - 1);
-
-        directoryService.setDirectoryServerBaseUri(baseUrl);
-        caseService.setBaseUri(baseUrl);
-
-        final Dispatcher dispatcher = new Dispatcher() {
-            @SneakyThrows
-            @Override
-            public MockResponse dispatch(RecordedRequest request) {
-                String path = Objects.requireNonNull(request.getPath());
-                Buffer body = request.getBody();
-
-                if (path.matches("/v1/cases") && "POST".equals(request.getMethod())) {
-                    String bodyStr = body.readUtf8();
-                    if (bodyStr.contains("filename=\"" + TEST_FILE_WITH_ERRORS + "\"")) {
-                        return new MockResponse().setResponseCode(409).setBody("invalid file");
-                    } else if (bodyStr.contains("filename=\"" + TEST_INCORRECT_FILE + "\"")) {
-                        return new MockResponse().setResponseCode(422).setBody("file with bad extension");
-                    } else {
-                        return new MockResponse().setResponseCode(200);
-                    }
-                } else if (path.matches("/v1/directories/paths/elements.*") && "POST".equals(request.getMethod())) {
-                    return new MockResponse().setResponseCode(200);
-                }
-                return new MockResponse().setResponseCode(418);
-            }
-        };
-        server.setDispatcher(dispatcher);
+        directoryService.setDirectoryServerBaseUri(wireMockServer.baseUrl());
+        caseService.setBaseUri(wireMockServer.baseUrl());
     }
 
     @Test
     public void testImportCase() throws Exception {
+        wireMockUtils.stubImportCase(TEST_FILE);
+        wireMockUtils.stubAddDirectoryElement("Automatic_cases_import");
         try (InputStream is = new FileInputStream(ResourceUtils.getFile("classpath:" + TEST_FILE))) {
             MockMultipartFile mockFile = new MockMultipartFile("caseFile", TEST_FILE, "text/xml", is);
             MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
@@ -115,7 +88,9 @@ public class CaseImportTest {
     }
 
     @Test
-    public void testImportCaseWithError() throws Exception {
+    public void testImportCaseWithBadRequestError() throws Exception {
+        wireMockUtils.stubImportCaseWithErrorInvalid(TEST_FILE_WITH_ERRORS);
+        wireMockUtils.stubAddDirectoryElement("Automatic_cases_import");
         try (InputStream is = new FileInputStream(ResourceUtils.getFile("classpath:" + TEST_FILE))) {
             MockMultipartFile mockFile = new MockMultipartFile("caseFile", TEST_FILE_WITH_ERRORS, "text/xml", is);
             MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
@@ -129,12 +104,17 @@ public class CaseImportTest {
                     )
                     .andExpect(status().isBadRequest());
         }
+    }
 
+    @Test
+    public void testImportCaseWithUnprocessableEntityError() throws Exception {
+        wireMockUtils.stubImportCaseWithErrorBadExtension(TEST_INCORRECT_FILE);
+        wireMockUtils.stubAddDirectoryElement("Automatic_cases_import");
         try (InputStream is = new FileInputStream(ResourceUtils.getFile("classpath:" + TEST_FILE))) {
             MockMultipartFile mockFile = new MockMultipartFile("caseFile", TEST_INCORRECT_FILE, "text/xml", is);
             MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
             bodyBuilder.part("caseFile", mockFile.getBytes())
-                    .filename(TEST_FILE_WITH_ERRORS)
+                    .filename(TEST_INCORRECT_FILE)
                     .contentType(MediaType.TEXT_XML);
 
             mockMvc.perform(multipart("/v1/cases").file(mockFile)

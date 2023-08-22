@@ -20,7 +20,7 @@ import java.util.UUID;
 @Service
 class CaseImportService {
 
-    @Value("${target-directory-name: CVG_Recollement}")
+    @Value("${target-directory-name:automatic cases}")
     private String directoryName;
 
     private final DirectoryService directoryService;

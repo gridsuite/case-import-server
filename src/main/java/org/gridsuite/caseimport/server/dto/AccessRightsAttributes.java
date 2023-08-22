@@ -12,10 +12,7 @@ import lombok.*;
  * @author Abdelsalem Hedhili <abdelsalem.hedhili at rte-france.com>
  */
 @Getter
-@Setter
-@NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class AccessRightsAttributes {
 
     private Boolean isPrivate;

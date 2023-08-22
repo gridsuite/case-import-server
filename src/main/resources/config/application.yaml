@@ -2,4 +2,4 @@ spring:
   application:
     name: case-import-server
 
-target-directory-name: CVG/Recollement
+target-directory-name: Automatic_cases_import
