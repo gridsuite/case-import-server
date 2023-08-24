@@ -3,3 +3,10 @@ target/
 # IntelliJ
 /.idea
 *.iml
+
+# VSCode
+/.vscode
+/.settings
+.classpath
+.factorypath
+.project

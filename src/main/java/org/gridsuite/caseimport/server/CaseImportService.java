@@ -37,6 +37,6 @@ class CaseImportService {
     void importCaseInDirectory(MultipartFile caseFile, String userId) {
         UUID caseUuid = caseService.importCase(caseFile);
         var caseElementAttributes = new ElementAttributes(caseUuid, caseFile.getOriginalFilename(), CASE, new AccessRightsAttributes(false), userId, 0L, null);
-        directoryService.createDirectory(caseElementAttributes, directoryName, userId);
+        directoryService.createElementInDirectory(caseElementAttributes, directoryName, userId);
     }
 }

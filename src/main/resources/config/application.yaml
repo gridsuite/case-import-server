@@ -3,3 +3,6 @@ spring:
     name: case-import-server
 
 target-directory-name: Automatic_cases_import
+
+server:
+  max-http-header-size: 64000

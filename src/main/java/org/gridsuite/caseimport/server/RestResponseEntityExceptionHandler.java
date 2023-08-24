@@ -23,7 +23,7 @@ public class RestResponseEntityExceptionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestResponseEntityExceptionHandler.class);
 
     @ExceptionHandler(value = {CaseImportException.class})
-    protected ResponseEntity<Object> handleExploreException(CaseImportException exception) {
+    protected ResponseEntity<Object> handleCaseImportException(CaseImportException exception) {
         if (LOGGER.isErrorEnabled()) {
             LOGGER.error(exception.getMessage(), exception);
         }

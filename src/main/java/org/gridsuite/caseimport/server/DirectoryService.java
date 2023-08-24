@@ -47,7 +47,7 @@ public class DirectoryService {
         this.directoryServerBaseUri = directoryServerBaseUri;
     }
 
-    public void createDirectory(ElementAttributes elementAttributes, String directoryName, String userId) {
+    public void createElementInDirectory(ElementAttributes elementAttributes, String directoryName, String userId) {
         String path = UriComponentsBuilder
                 .fromPath(ROOT_DIRECTORIES_SERVER_ROOT_PATH + "/paths/elements")
                 .queryParam("directoryPath", directoryName)
