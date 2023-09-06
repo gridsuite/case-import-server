@@ -15,7 +15,7 @@
     <parent>
         <groupId>com.powsybl</groupId>
         <artifactId>powsybl-parent-ws</artifactId>
-        <version>12</version>
+        <version>14</version>
         <relativePath/>
     </parent>
 
@@ -44,7 +44,7 @@
     </developers>
 
     <properties>
-        <gridsuite-dependencies.version>25</gridsuite-dependencies.version>
+        <gridsuite-dependencies.version>26</gridsuite-dependencies.version>
     </properties>
 
     <build>
@@ -110,7 +110,7 @@
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-ui</artifactId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
         </dependency>
 
         <!-- Runtime dependencies -->

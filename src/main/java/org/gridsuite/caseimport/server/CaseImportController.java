@@ -35,8 +35,8 @@ public class CaseImportController {
     @PostMapping(value = "/cases", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "Import a case in the parametrized directory")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The case is imported"),
-            @ApiResponse(responseCode = "400", description = "Invalid case file"),
-            @ApiResponse(responseCode = "422", description = "File with wrong extension")})
+        @ApiResponse(responseCode = "400", description = "Invalid case file"),
+        @ApiResponse(responseCode = "422", description = "File with wrong extension")})
     public ResponseEntity<Void> importCase(@Parameter(description = "case file") @RequestPart("caseFile") MultipartFile caseFile,
                                            @RequestHeader("userId") String userId) {
         caseImportService.importCaseInDirectory(caseFile, userId);
