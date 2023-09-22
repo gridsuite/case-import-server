@@ -73,7 +73,7 @@ public class CaseService {
         return caseUuid;
     }
 
-    private static CaseImportException wrapRemoteError(String response, HttpStatus statusCode) {
+    private static CaseImportException wrapRemoteError(String response, HttpStatusCode statusCode) {
         if (!"".equals(response)) {
             throw new CaseImportException(CaseImportException.Type.REMOTE_ERROR, response);
         } else {
