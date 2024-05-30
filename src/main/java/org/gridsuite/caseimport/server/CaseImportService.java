@@ -45,7 +45,7 @@ class CaseImportService {
         }
         String targetDirectory = caseImportConfig.getTargetDirectories().get(caseOrigin);
         if (targetDirectory == null) {
-            throw new CaseImportException(UNKNOWN_CASE_SOURCE, "{\"message\": Unknown case source " + caseOrigin + "\"}");
+            throw new CaseImportException(UNKNOWN_CASE_SOURCE, "Unknown case origin " + caseOrigin);
         }
         return targetDirectory;
     }

@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpStatusCodeException;
 
+import java.util.Map;
+
 /**
  * @author Abdelsalem Hedhili <abdelsalem.hedhili at rte-france.com>
  */
@@ -28,9 +30,9 @@ public class RestResponseEntityExceptionHandler {
             LOGGER.error(exception.getMessage(), exception);
         }
         return switch (exception.getType()) {
-            case REMOTE_ERROR -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+            case REMOTE_ERROR -> new ResponseEntity<>(Map.of("message", exception.getMessage()), HttpStatus.BAD_REQUEST);
             case INCORRECT_CASE_FILE, UNKNOWN_CASE_SOURCE ->
-                    ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(exception.getMessage());
+                    new ResponseEntity<>(Map.of("message", exception.getMessage()), HttpStatus.UNPROCESSABLE_ENTITY);
             default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         };
     }

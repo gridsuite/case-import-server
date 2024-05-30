@@ -73,7 +73,7 @@ public class CaseService {
         if (!"".equals(response)) {
             throw new CaseImportException(CaseImportException.Type.REMOTE_ERROR, response);
         } else {
-            throw new CaseImportException(CaseImportException.Type.REMOTE_ERROR, "{\"message\": " + statusCode + "\"}");
+            throw new CaseImportException(CaseImportException.Type.REMOTE_ERROR, statusCode.toString());
         }
     }
 }
