@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -28,6 +27,7 @@ import java.io.InputStream;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -39,6 +39,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class CaseImportTest {
     private static final String TEST_FILE = "testCase.xiidm";
     private static final String TEST_FILE_WITH_ERRORS = "testCase_with_errors.xiidm";
+    private static final String DEFAULT_IMPORT_DIRECTORY = "Automatic_cases_import";
+    private static final String INVALID_CASE_ORIGIN = "invalid_source";
+    private static final String CASE_ORIGIN_1 = "origin1";
+    private static final String CASE_ORIGIN_1_DIRECTORY = "case_import_directory_1";
 
     private static final String TEST_INCORRECT_FILE = "application-default.yml";
     private static final String USER1 = "user1";
@@ -71,32 +75,24 @@ public class CaseImportTest {
     @Test
     public void testImportCase() throws Exception {
         wireMockUtils.stubImportCase(TEST_FILE);
-        wireMockUtils.stubAddDirectoryElement("Automatic_cases_import");
+        wireMockUtils.stubAddDirectoryElement(DEFAULT_IMPORT_DIRECTORY);
         try (InputStream is = new FileInputStream(ResourceUtils.getFile("classpath:" + TEST_FILE))) {
             MockMultipartFile mockFile = new MockMultipartFile("caseFile", TEST_FILE, "text/xml", is);
-            MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
-            bodyBuilder.part("caseFile", mockFile.getBytes())
-                    .filename(TEST_FILE)
-                    .contentType(MediaType.TEXT_XML);
 
             mockMvc.perform(multipart("/v1/cases").file(mockFile)
                             .header("userId", USER1)
                             .contentType(MediaType.MULTIPART_FORM_DATA)
                     )
-                    .andExpect(status().isOk());
+                    .andExpect(status().isCreated());
         }
     }
 
     @Test
     public void testImportCaseWithBadRequestError() throws Exception {
         wireMockUtils.stubImportCaseWithErrorInvalid(TEST_FILE_WITH_ERRORS);
-        wireMockUtils.stubAddDirectoryElement("Automatic_cases_import");
+        wireMockUtils.stubAddDirectoryElement(DEFAULT_IMPORT_DIRECTORY);
         try (InputStream is = new FileInputStream(ResourceUtils.getFile("classpath:" + TEST_FILE))) {
             MockMultipartFile mockFile = new MockMultipartFile("caseFile", TEST_FILE_WITH_ERRORS, "text/xml", is);
-            MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
-            bodyBuilder.part("caseFile", mockFile.getBytes())
-                    .filename(TEST_FILE_WITH_ERRORS)
-                    .contentType(MediaType.TEXT_XML);
 
             mockMvc.perform(multipart("/v1/cases").file(mockFile)
                             .header("userId", USER1)
@@ -109,19 +105,49 @@ public class CaseImportTest {
     @Test
     public void testImportCaseWithUnprocessableEntityError() throws Exception {
         wireMockUtils.stubImportCaseWithErrorBadExtension(TEST_INCORRECT_FILE);
-        wireMockUtils.stubAddDirectoryElement("Automatic_cases_import");
+        wireMockUtils.stubAddDirectoryElement(DEFAULT_IMPORT_DIRECTORY);
         try (InputStream is = new FileInputStream(ResourceUtils.getFile("classpath:" + TEST_FILE))) {
             MockMultipartFile mockFile = new MockMultipartFile("caseFile", TEST_INCORRECT_FILE, "text/xml", is);
-            MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
-            bodyBuilder.part("caseFile", mockFile.getBytes())
-                    .filename(TEST_INCORRECT_FILE)
-                    .contentType(MediaType.TEXT_XML);
 
             mockMvc.perform(multipart("/v1/cases").file(mockFile)
                             .header("userId", USER1)
                             .contentType(MediaType.MULTIPART_FORM_DATA)
                     )
                     .andExpect(status().isUnprocessableEntity());
+        }
+    }
+
+    @Test
+    public void testImportCaseWithInvalidOrigin() throws Exception {
+        wireMockUtils.stubImportCaseWithErrorInvalid(TEST_FILE);
+        wireMockUtils.stubAddDirectoryElement(DEFAULT_IMPORT_DIRECTORY);
+        try (InputStream is = new FileInputStream(ResourceUtils.getFile("classpath:" + TEST_FILE))) {
+            MockMultipartFile mockFile = new MockMultipartFile("caseFile", TEST_FILE, "text/xml", is);
+
+            mockMvc.perform(multipart("/v1/cases").file(mockFile)
+                            .header("userId", USER1)
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .param("caseFileSource", INVALID_CASE_ORIGIN)
+                    )
+                    .andExpect(status().isUnprocessableEntity());
+        }
+    }
+
+    @Test
+    public void testImportCaseWithValidOrigin() throws Exception {
+        wireMockUtils.stubImportCase(TEST_FILE);
+        wireMockUtils.stubAddDirectoryElement(CASE_ORIGIN_1_DIRECTORY);
+        try (InputStream is = new FileInputStream(ResourceUtils.getFile("classpath:" + TEST_FILE))) {
+            MockMultipartFile mockFile = new MockMultipartFile("caseFile", TEST_FILE, "text/xml", is);
+
+            mockMvc.perform(multipart("/v1/cases").file(mockFile)
+                            .header("userId", USER1)
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .param("caseFileSource", CASE_ORIGIN_1)
+                    )
+                    .andExpectAll(status().isCreated(),
+                            jsonPath("caseName").value(TEST_FILE),
+                            jsonPath("parentDirectory").value(CASE_ORIGIN_1_DIRECTORY));
         }
     }
 }

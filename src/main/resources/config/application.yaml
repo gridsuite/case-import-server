@@ -2,7 +2,11 @@ spring:
   application:
     name: case-import-server
 
-target-directory-name: Automatic_cases_import
+# mapping of target directories based on the origin of the case
+case-import-server:
+  target-directories:
+    origin1: case_import_directory_1
+    default: Automatic_cases_import
 
 server:
   max-http-header-size: 64000

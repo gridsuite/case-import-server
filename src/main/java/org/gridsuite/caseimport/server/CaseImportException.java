@@ -16,6 +16,7 @@ public class CaseImportException extends RuntimeException {
     public enum Type {
         IMPORT_CASE_FAILED,
         INCORRECT_CASE_FILE,
+        UNKNOWN_CASE_SOURCE,
         REMOTE_ERROR,
     }
 
