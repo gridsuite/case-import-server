@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.gridsuite.caseimport.server.dto.ImportedCase;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -42,8 +43,8 @@ public class CaseImportController {
         @ApiResponse(responseCode = "422", description = "File with wrong extension"),
         @ApiResponse(responseCode = "201", description = "Case created successfully")})
     public ResponseEntity<ImportedCase> importCase(@Parameter(description = "case file") @RequestPart("caseFile") MultipartFile caseFile,
-                                           @Parameter(description = "origin of case file") @RequestParam(required = false) String caseFileSource,
-                                           @RequestHeader("userId") String userId) {
+                                                   @Parameter(description = "origin of case file") @RequestParam(defaultValue = "default", required = false) String caseFileSource,
+                                                   @RequestHeader("userId") String userId) {
         ImportedCase importedCase = caseImportService.importCaseInDirectory(caseFile, caseFileSource, userId);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(importedCase);

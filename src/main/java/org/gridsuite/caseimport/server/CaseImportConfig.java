@@ -7,10 +7,10 @@
 
 package org.gridsuite.caseimport.server;
 
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 import java.util.Map;
 
@@ -20,8 +20,15 @@ import java.util.Map;
 
 @Setter
 @Getter
-@ConfigurationPropertiesScan
 @ConfigurationProperties("case-import-server")
 public class CaseImportConfig {
     private Map<String, String> targetDirectories;
+    private static final String DEFAULT_IMPORT_DIR_KEY = "default";
+    private static final String DEFAULT_IMPORT_DIR = "Automatic_cases_import";
+
+    @PostConstruct
+    public void addDefaultTarget() {
+        targetDirectories.putIfAbsent(DEFAULT_IMPORT_DIR_KEY, DEFAULT_IMPORT_DIR);
+    }
+
 }

@@ -8,7 +8,7 @@ package org.gridsuite.caseimport.server;
 
 import org.gridsuite.caseimport.server.dto.AccessRightsAttributes;
 import org.gridsuite.caseimport.server.dto.ElementAttributes;
-import org.springframework.beans.factory.annotation.Value;
+import org.gridsuite.caseimport.server.dto.ImportedCase;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,9 +21,6 @@ import static org.gridsuite.caseimport.server.CaseImportException.Type.UNKNOWN_C
  */
 @Service
 class CaseImportService {
-
-    @Value("${case-import-server.target-directories.default:automatic cases}")
-    private String directoryName;
 
     private final CaseImportConfig caseImportConfig;
 
@@ -40,9 +37,6 @@ class CaseImportService {
     }
 
     private String getTargetDirectory(String caseOrigin) {
-        if (caseOrigin == null || caseOrigin.isEmpty()) {
-            return directoryName;
-        }
         String targetDirectory = caseImportConfig.getTargetDirectories().get(caseOrigin);
         if (targetDirectory == null) {
             throw new CaseImportException(UNKNOWN_CASE_SOURCE, "Unknown case origin " + caseOrigin);
