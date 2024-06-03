@@ -16,11 +16,9 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Objects;
 import java.util.UUID;
 
-import static org.gridsuite.caseimport.server.CaseImportException.Type.IMPORT_CASE_FAILED;
 import static org.gridsuite.caseimport.server.CaseImportException.Type.INCORRECT_CASE_FILE;
 
 
@@ -51,14 +49,12 @@ public class CaseService {
         UUID caseUuid;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        try {
-            if (multipartFile != null) {
-                multipartBodyBuilder.part("file", multipartFile.getBytes())
-                        .filename(Objects.requireNonNull(multipartFile.getOriginalFilename()));
-            }
-        } catch (IOException e) {
-            throw new CaseImportException(IMPORT_CASE_FAILED);
+
+        if (multipartFile != null) {
+            multipartBodyBuilder.part("file", multipartFile.getResource())
+                    .filename(Objects.requireNonNull(multipartFile.getOriginalFilename()));
         }
+
         HttpEntity<MultiValueMap<String, HttpEntity<?>>> request = new HttpEntity<>(
                 multipartBodyBuilder.build(), headers);
         try {
@@ -77,7 +73,7 @@ public class CaseService {
         if (!"".equals(response)) {
             throw new CaseImportException(CaseImportException.Type.REMOTE_ERROR, response);
         } else {
-            throw new CaseImportException(CaseImportException.Type.REMOTE_ERROR, "{\"message\": " + statusCode + "\"}");
+            throw new CaseImportException(CaseImportException.Type.REMOTE_ERROR, statusCode.toString());
         }
     }
 }

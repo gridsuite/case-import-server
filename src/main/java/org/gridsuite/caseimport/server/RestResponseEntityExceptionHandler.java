@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpStatusCodeException;
 
+import java.util.Map;
+
 /**
  * @author Abdelsalem Hedhili <abdelsalem.hedhili at rte-france.com>
  */
@@ -27,20 +29,18 @@ public class RestResponseEntityExceptionHandler {
         if (LOGGER.isErrorEnabled()) {
             LOGGER.error(exception.getMessage(), exception);
         }
-        switch (exception.getType()) {
-            case REMOTE_ERROR:
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
-            case INCORRECT_CASE_FILE:
-                return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(exception.getMessage());
-            default:
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        return switch (exception.getType()) {
+            case REMOTE_ERROR -> new ResponseEntity<>(Map.of("message", exception.getMessage()), HttpStatus.BAD_REQUEST);
+            case INCORRECT_CASE_FILE, UNKNOWN_CASE_SOURCE ->
+                    new ResponseEntity<>(Map.of("message", exception.getMessage()), HttpStatus.UNPROCESSABLE_ENTITY);
+            default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        };
     }
 
     @ExceptionHandler(value = {Exception.class})
     protected ResponseEntity<Object> handleAllException(Exception exception) {
-        if (exception instanceof HttpStatusCodeException) {
-            return ResponseEntity.status(((HttpStatusCodeException) exception).getStatusCode()).body(exception.getMessage());
+        if (exception instanceof HttpStatusCodeException httpStatusCodeException) {
+            return ResponseEntity.status(httpStatusCodeException.getStatusCode()).body(exception.getMessage());
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
         }
