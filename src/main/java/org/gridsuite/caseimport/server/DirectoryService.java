@@ -51,6 +51,7 @@ public class DirectoryService {
         String path = UriComponentsBuilder
                 .fromPath(ROOT_DIRECTORIES_SERVER_ROOT_PATH + "/paths/elements")
                 .queryParam("directoryPath", directoryName)
+                .build()
                 .toUriString();
         HttpHeaders headers = new HttpHeaders();
         headers.add(HEADER_USER_ID, userId);
