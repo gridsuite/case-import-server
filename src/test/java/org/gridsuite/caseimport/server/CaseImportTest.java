@@ -79,7 +79,7 @@ public class CaseImportTest {
         try (InputStream is = new FileInputStream(ResourceUtils.getFile("classpath:" + TEST_FILE))) {
             MockMultipartFile mockFile = new MockMultipartFile("caseFile", TEST_FILE, "text/xml", is);
 
-            mockMvc.perform(multipart("/v1/cases").file(mockFile)
+            mockMvc.perform(multipart("/v1/cases/testCase").file(mockFile)
                             .header("userId", USER1)
                             .contentType(MediaType.MULTIPART_FORM_DATA)
                     )
@@ -94,7 +94,7 @@ public class CaseImportTest {
         try (InputStream is = new FileInputStream(ResourceUtils.getFile("classpath:" + TEST_FILE))) {
             MockMultipartFile mockFile = new MockMultipartFile("caseFile", TEST_FILE_WITH_ERRORS, "text/xml", is);
 
-            mockMvc.perform(multipart("/v1/cases").file(mockFile)
+            mockMvc.perform(multipart("/v1/cases/testCase_with_errors").file(mockFile)
                             .header("userId", USER1)
                             .contentType(MediaType.MULTIPART_FORM_DATA)
                     )
@@ -109,7 +109,7 @@ public class CaseImportTest {
         try (InputStream is = new FileInputStream(ResourceUtils.getFile("classpath:" + TEST_FILE))) {
             MockMultipartFile mockFile = new MockMultipartFile("caseFile", TEST_INCORRECT_FILE, "text/xml", is);
 
-            mockMvc.perform(multipart("/v1/cases").file(mockFile)
+            mockMvc.perform(multipart("/v1/cases/incorrectFile").file(mockFile)
                             .header("userId", USER1)
                             .contentType(MediaType.MULTIPART_FORM_DATA)
                     )
@@ -124,7 +124,7 @@ public class CaseImportTest {
         try (InputStream is = new FileInputStream(ResourceUtils.getFile("classpath:" + TEST_FILE))) {
             MockMultipartFile mockFile = new MockMultipartFile("caseFile", TEST_FILE, "text/xml", is);
 
-            mockMvc.perform(multipart("/v1/cases").file(mockFile)
+            mockMvc.perform(multipart("/v1/cases/testCase").file(mockFile)
                             .header("userId", USER1)
                             .contentType(MediaType.MULTIPART_FORM_DATA)
                             .param("caseFileSource", INVALID_CASE_ORIGIN)
@@ -140,13 +140,13 @@ public class CaseImportTest {
         try (InputStream is = new FileInputStream(ResourceUtils.getFile("classpath:" + TEST_FILE))) {
             MockMultipartFile mockFile = new MockMultipartFile("caseFile", TEST_FILE, "text/xml", is);
 
-            mockMvc.perform(multipart("/v1/cases").file(mockFile)
+            mockMvc.perform(multipart("/v1/cases/testCase").file(mockFile)
                             .header("userId", USER1)
                             .contentType(MediaType.MULTIPART_FORM_DATA)
                             .param("caseFileSource", CASE_ORIGIN_1)
                     )
                     .andExpectAll(status().isCreated(),
-                            jsonPath("caseName").value(TEST_FILE),
+                            jsonPath("caseName").value("testCase"),
                             jsonPath("parentDirectory").value(CASE_ORIGIN_1_DIRECTORY));
         }
     }

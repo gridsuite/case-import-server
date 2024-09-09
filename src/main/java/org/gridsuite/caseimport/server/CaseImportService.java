@@ -44,10 +44,10 @@ class CaseImportService {
         return targetDirectory;
     }
 
-    ImportedCase importCaseInDirectory(MultipartFile caseFile, String caseOrigin, String userId) {
+    ImportedCase importCaseInDirectory(MultipartFile caseFile, String caseName, String caseOrigin, String userId) {
         String targetDirectory = getTargetDirectory(caseOrigin);
         UUID caseUuid = caseService.importCase(caseFile);
-        var caseElementAttributes = new ElementAttributes(caseUuid, caseFile.getOriginalFilename(), CASE, new AccessRightsAttributes(false), userId, 0L, null);
+        var caseElementAttributes = new ElementAttributes(caseUuid, caseName, CASE, new AccessRightsAttributes(false), userId, 0L, null);
         directoryService.createElementInDirectory(caseElementAttributes, targetDirectory, userId);
         ImportedCase importedCase = new ImportedCase();
         importedCase.setCaseName(caseElementAttributes.getElementName());
