@@ -12,6 +12,7 @@ import org.gridsuite.caseimport.server.dto.ImportedCase;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.gridsuite.caseimport.server.CaseImportException.Type.UNKNOWN_CASE_SOURCE;
@@ -44,9 +45,10 @@ class CaseImportService {
         return targetDirectory;
     }
 
-    ImportedCase importCaseInDirectory(MultipartFile caseFile, String caseName, String caseOrigin, String userId) {
+    ImportedCase importCaseInDirectory(MultipartFile caseFile, Optional<String> caseNameParam, String caseOrigin, String userId) {
         String targetDirectory = getTargetDirectory(caseOrigin);
         UUID caseUuid = caseService.importCase(caseFile);
+        String caseName = caseNameParam.filter(s -> !s.isEmpty()).orElse(caseFile.getOriginalFilename());
         var caseElementAttributes = new ElementAttributes(caseUuid, caseName, CASE, new AccessRightsAttributes(false), userId, 0L, null);
         directoryService.createElementInDirectory(caseElementAttributes, targetDirectory, userId);
         ImportedCase importedCase = new ImportedCase();

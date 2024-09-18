@@ -79,7 +79,7 @@ public class CaseImportTest {
         try (InputStream is = new FileInputStream(ResourceUtils.getFile("classpath:" + TEST_FILE))) {
             MockMultipartFile mockFile = new MockMultipartFile("caseFile", TEST_FILE, "text/xml", is);
 
-            mockMvc.perform(multipart("/v1/cases/testCase").file(mockFile)
+            mockMvc.perform(multipart("/v1/cases").file(mockFile)
                             .header("userId", USER1)
                             .contentType(MediaType.MULTIPART_FORM_DATA)
                     )
@@ -94,7 +94,7 @@ public class CaseImportTest {
         try (InputStream is = new FileInputStream(ResourceUtils.getFile("classpath:" + TEST_FILE))) {
             MockMultipartFile mockFile = new MockMultipartFile("caseFile", TEST_FILE_WITH_ERRORS, "text/xml", is);
 
-            mockMvc.perform(multipart("/v1/cases/testCase_with_errors").file(mockFile)
+            mockMvc.perform(multipart("/v1/cases").file(mockFile)
                             .header("userId", USER1)
                             .contentType(MediaType.MULTIPART_FORM_DATA)
                     )
@@ -109,7 +109,7 @@ public class CaseImportTest {
         try (InputStream is = new FileInputStream(ResourceUtils.getFile("classpath:" + TEST_FILE))) {
             MockMultipartFile mockFile = new MockMultipartFile("caseFile", TEST_INCORRECT_FILE, "text/xml", is);
 
-            mockMvc.perform(multipart("/v1/cases/incorrectFile").file(mockFile)
+            mockMvc.perform(multipart("/v1/cases").file(mockFile)
                             .header("userId", USER1)
                             .contentType(MediaType.MULTIPART_FORM_DATA)
                     )
@@ -124,7 +124,7 @@ public class CaseImportTest {
         try (InputStream is = new FileInputStream(ResourceUtils.getFile("classpath:" + TEST_FILE))) {
             MockMultipartFile mockFile = new MockMultipartFile("caseFile", TEST_FILE, "text/xml", is);
 
-            mockMvc.perform(multipart("/v1/cases/testCase").file(mockFile)
+            mockMvc.perform(multipart("/v1/cases").file(mockFile)
                             .header("userId", USER1)
                             .contentType(MediaType.MULTIPART_FORM_DATA)
                             .param("caseFileSource", INVALID_CASE_ORIGIN)
@@ -135,19 +135,41 @@ public class CaseImportTest {
 
     @Test
     public void testImportCaseWithValidOrigin() throws Exception {
+        final String caseName = "testCase";
         wireMockUtils.stubImportCase(TEST_FILE);
         wireMockUtils.stubAddDirectoryElement(CASE_ORIGIN_1_DIRECTORY);
         try (InputStream is = new FileInputStream(ResourceUtils.getFile("classpath:" + TEST_FILE))) {
             MockMultipartFile mockFile = new MockMultipartFile("caseFile", TEST_FILE, "text/xml", is);
 
-            mockMvc.perform(multipart("/v1/cases/testCase").file(mockFile)
+            mockMvc.perform(multipart("/v1/cases").file(mockFile)
                             .header("userId", USER1)
                             .contentType(MediaType.MULTIPART_FORM_DATA)
                             .param("caseFileSource", CASE_ORIGIN_1)
+                            .param("caseName", caseName)
                     )
                     .andExpectAll(status().isCreated(),
-                            jsonPath("caseName").value("testCase"),
+                            jsonPath("caseName").value(caseName),
                             jsonPath("parentDirectory").value(CASE_ORIGIN_1_DIRECTORY));
         }
+    }
+
+    @Test
+    public void testGivenEmptyCaseNameUseFilename() throws Exception {
+        wireMockUtils.stubImportCase(TEST_FILE);
+        wireMockUtils.stubAddDirectoryElement(CASE_ORIGIN_1_DIRECTORY);
+        try (InputStream is = new FileInputStream(ResourceUtils.getFile("classpath:" + TEST_FILE))) {
+            MockMultipartFile mockFile = new MockMultipartFile("caseFile", TEST_FILE, "text/xml", is);
+
+            mockMvc.perform(multipart("/v1/cases").file(mockFile)
+                            .header("userId", USER1)
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .param("caseFileSource", CASE_ORIGIN_1)
+                            .param("caseName", "")
+                    )
+                    .andExpectAll(status().isCreated(),
+                            jsonPath("caseName").value(TEST_FILE),
+                            jsonPath("parentDirectory").value(CASE_ORIGIN_1_DIRECTORY));
+        }
+
     }
 }
