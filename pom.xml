@@ -44,7 +44,7 @@
     </developers>
 
     <properties>
-        <powsybl-ws-dependencies.version>2.14.0</powsybl-ws-dependencies.version>
+        <gridsuite-dependencies.version>33</gridsuite-dependencies.version>
     </properties>
 
     <build>
@@ -83,9 +83,9 @@
 
             <!-- imports -->
             <dependency>
-                <groupId>com.powsybl</groupId>
-                <artifactId>powsybl-ws-dependencies</artifactId>
-                <version>${powsybl-ws-dependencies.version}</version>
+                <groupId>org.gridsuite</groupId>
+                <artifactId>gridsuite-dependencies</artifactId>
+                <version>${gridsuite-dependencies.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
