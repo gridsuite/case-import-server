@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.NotBlank;
 import org.gridsuite.caseimport.server.dto.ImportedCase;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
@@ -19,8 +18,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -46,7 +43,7 @@ public class CaseImportController {
         @ApiResponse(responseCode = "422", description = "File with wrong extension"),
         @ApiResponse(responseCode = "201", description = "Case created successfully")})
     public ResponseEntity<ImportedCase> importCase(@Parameter(description = "case file") @RequestPart("caseFile") MultipartFile caseFile,
-                                                   @Parameter(description = "name of the case") @NotBlank Optional<String> caseName,
+                                                   @Parameter(description = "name of the case") @RequestParam(required = false) String caseName,
                                                    @Parameter(description = "origin of case file") @RequestParam(defaultValue = "default", required = false) String caseFileSource,
                                                    @RequestHeader("userId") String userId) {
         ImportedCase importedCase = caseImportService.importCaseInDirectory(caseFile, caseName, caseFileSource, userId);
