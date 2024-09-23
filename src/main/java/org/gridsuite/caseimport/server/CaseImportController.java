@@ -43,9 +43,10 @@ public class CaseImportController {
         @ApiResponse(responseCode = "422", description = "File with wrong extension"),
         @ApiResponse(responseCode = "201", description = "Case created successfully")})
     public ResponseEntity<ImportedCase> importCase(@Parameter(description = "case file") @RequestPart("caseFile") MultipartFile caseFile,
+                                                   @Parameter(description = "name of the case") @RequestParam(required = false) String caseName,
                                                    @Parameter(description = "origin of case file") @RequestParam(defaultValue = "default", required = false) String caseFileSource,
                                                    @RequestHeader("userId") String userId) {
-        ImportedCase importedCase = caseImportService.importCaseInDirectory(caseFile, caseFileSource, userId);
+        ImportedCase importedCase = caseImportService.importCaseInDirectory(caseFile, caseName, caseFileSource, userId);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(importedCase);
     }

@@ -6,12 +6,15 @@
  */
 package org.gridsuite.caseimport.server;
 
+import org.apache.commons.lang3.StringUtils;
 import org.gridsuite.caseimport.server.dto.AccessRightsAttributes;
 import org.gridsuite.caseimport.server.dto.ElementAttributes;
 import org.gridsuite.caseimport.server.dto.ImportedCase;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import com.powsybl.commons.datasource.DataSourceUtil;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import static org.gridsuite.caseimport.server.CaseImportException.Type.UNKNOWN_CASE_SOURCE;
@@ -44,10 +47,18 @@ class CaseImportService {
         return targetDirectory;
     }
 
-    ImportedCase importCaseInDirectory(MultipartFile caseFile, String caseOrigin, String userId) {
+    ImportedCase importCaseInDirectory(MultipartFile caseFile, String caseName, String caseOrigin, String userId) {
         String targetDirectory = getTargetDirectory(caseOrigin);
         UUID caseUuid = caseService.importCase(caseFile);
-        var caseElementAttributes = new ElementAttributes(caseUuid, caseFile.getOriginalFilename(), CASE, new AccessRightsAttributes(false), userId, 0L, null);
+        String computedCaseName = StringUtils.isBlank(caseName) ? DataSourceUtil.getBaseName(Objects.requireNonNull(caseFile.getOriginalFilename())) : caseName;
+        var caseElementAttributes = new ElementAttributes(caseUuid,
+                computedCaseName,
+                CASE,
+                new AccessRightsAttributes(false),
+                userId,
+                0L,
+                null);
+
         directoryService.createElementInDirectory(caseElementAttributes, targetDirectory, userId);
         ImportedCase importedCase = new ImportedCase();
         importedCase.setCaseName(caseElementAttributes.getElementName());
