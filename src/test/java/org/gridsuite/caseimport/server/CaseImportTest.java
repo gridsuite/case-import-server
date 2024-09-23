@@ -38,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 public class CaseImportTest {
     private static final String TEST_FILE = "testCase.xiidm";
+    private static final String TEST_CASE_NAME = "testCase";
     private static final String TEST_FILE_WITH_ERRORS = "testCase_with_errors.xiidm";
     private static final String DEFAULT_IMPORT_DIRECTORY = "Automatic_cases_import";
     private static final String INVALID_CASE_ORIGIN = "invalid_source";
@@ -167,7 +168,7 @@ public class CaseImportTest {
                             .param("caseName", "")
                     )
                     .andExpectAll(status().isCreated(),
-                            jsonPath("caseName").value(TEST_FILE),
+                            jsonPath("caseName").value(TEST_CASE_NAME),
                             jsonPath("parentDirectory").value(CASE_ORIGIN_1_DIRECTORY));
         }
 
