@@ -6,7 +6,6 @@
  */
 package org.gridsuite.caseimport.server;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.http.client.MultipartBodyBuilder;
@@ -33,7 +32,6 @@ public class CaseService {
     private final RestTemplate restTemplate;
     private String caseServerBaseUri;
 
-    @Autowired
     public CaseService(@Value("${powsybl.services.case-server.base-uri:http://case-server/}") String caseServerBaseUri,
                        RestTemplate restTemplate) {
         this.caseServerBaseUri = caseServerBaseUri;

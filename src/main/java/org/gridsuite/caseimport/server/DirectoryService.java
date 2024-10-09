@@ -7,7 +7,6 @@
 package org.gridsuite.caseimport.server;
 
 import org.gridsuite.caseimport.server.dto.ElementAttributes;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -36,7 +35,6 @@ public class DirectoryService {
     private static final String HEADER_USER_ID = "userId";
     public static final String ELEMENT = "ELEMENT";
 
-    @Autowired
     public DirectoryService(
             @Value("${gridsuite.services.directory-server.base-uri:http://directory-server/}") String directoryServerBaseUri, RestTemplate restTemplate) {
         this.directoryServerBaseUri = directoryServerBaseUri;
