@@ -95,7 +95,7 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- Compile-time only dependencies -->
+        <!-- Annotation processor dependencies -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
