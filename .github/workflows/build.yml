@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    uses: powsybl/github-ci/.github/workflows/build-backend-app-generic.yml@e5c0e50af5cde4adb4a8528245e81441c8aac7de
+    uses: powsybl/github-ci/.github/workflows/build-backend-app-generic.yml@a24b2f08aebb7284e6b2c118eaeaa0fa9bec1d40
     with:
       sonarOrganization: gridsuite
       sonarProjectKey: org.gridsuite:case-import-server
