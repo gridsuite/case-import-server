@@ -44,7 +44,7 @@
     </developers>
 
     <properties>
-        <gridsuite-dependencies.version>40.0.0</gridsuite-dependencies.version>
+        <gridsuite-dependencies.version>41.0.0</gridsuite-dependencies.version>
         <sonar.organization>gridsuite</sonar.organization>
         <sonar.projectKey>org.gridsuite:case-import-server</sonar.projectKey>
     </properties>
