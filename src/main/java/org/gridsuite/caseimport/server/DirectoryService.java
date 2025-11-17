@@ -15,7 +15,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
@@ -41,7 +40,7 @@ public class DirectoryService {
             @Value("${gridsuite.services.directory-server.base-uri:http://directory-server/}") String directoryServerBaseUri,
             RestTemplateBuilder restTemplateBuilder) {
         this.directoryServerBaseUri = directoryServerBaseUri;
-        this.restTemplate = restTemplateBuilder.uriTemplateHandler(new DefaultUriBuilderFactory(directoryServerBaseUri)).build();
+        this.restTemplate = restTemplateBuilder.build();
     }
 
     public void setDirectoryServerBaseUri(String directoryServerBaseUri) {
