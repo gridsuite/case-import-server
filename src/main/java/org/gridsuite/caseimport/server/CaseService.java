@@ -15,7 +15,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -37,7 +36,7 @@ public class CaseService {
     public CaseService(@Value("${powsybl.services.case-server.base-uri:http://case-server/}") String caseServerBaseUri,
                        RestTemplateBuilder restTemplateBuilder) {
         this.caseServerBaseUri = caseServerBaseUri;
-        this.restTemplate = restTemplateBuilder.uriTemplateHandler(new DefaultUriBuilderFactory(caseServerBaseUri)).build();
+        this.restTemplate = restTemplateBuilder.build();
     }
 
     public void setBaseUri(String caseServerBaseUri) {
