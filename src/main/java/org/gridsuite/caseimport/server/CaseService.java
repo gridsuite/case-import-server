@@ -7,6 +7,7 @@
 package org.gridsuite.caseimport.server;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
@@ -33,9 +34,9 @@ public class CaseService {
     private String caseServerBaseUri;
 
     public CaseService(@Value("${powsybl.services.case-server.base-uri:http://case-server/}") String caseServerBaseUri,
-                       RestTemplate restTemplate) {
+                       RestTemplateBuilder restTemplateBuilder) {
         this.caseServerBaseUri = caseServerBaseUri;
-        this.restTemplate = restTemplate;
+        this.restTemplate = restTemplateBuilder.build();
     }
 
     public void setBaseUri(String caseServerBaseUri) {

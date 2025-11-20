@@ -8,6 +8,7 @@ package org.gridsuite.caseimport.server;
 
 import org.gridsuite.caseimport.server.dto.ElementAttributes;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -36,9 +37,10 @@ public class DirectoryService {
     public static final String ELEMENT = "ELEMENT";
 
     public DirectoryService(
-            @Value("${gridsuite.services.directory-server.base-uri:http://directory-server/}") String directoryServerBaseUri, RestTemplate restTemplate) {
+            @Value("${gridsuite.services.directory-server.base-uri:http://directory-server/}") String directoryServerBaseUri,
+            RestTemplateBuilder restTemplateBuilder) {
         this.directoryServerBaseUri = directoryServerBaseUri;
-        this.restTemplate = restTemplate;
+        this.restTemplate = restTemplateBuilder.build();
     }
 
     public void setDirectoryServerBaseUri(String directoryServerBaseUri) {
