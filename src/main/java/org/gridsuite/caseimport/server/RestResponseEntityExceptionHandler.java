@@ -31,8 +31,7 @@ public class RestResponseEntityExceptionHandler {
         }
         return switch (exception.getType()) {
             case REMOTE_ERROR -> new ResponseEntity<>(Map.of("message", exception.getMessage()), HttpStatus.BAD_REQUEST);
-            case INCORRECT_CASE_FILE, UNKNOWN_CASE_SOURCE ->
-                    new ResponseEntity<>(Map.of("message", exception.getMessage()), HttpStatus.UNPROCESSABLE_ENTITY);
+            case INCORRECT_CASE_FILE, UNKNOWN_CASE_SOURCE -> new ResponseEntity<>(Map.of("message", exception.getMessage()), HttpStatus.UNPROCESSABLE_ENTITY);
             default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         };
     }
