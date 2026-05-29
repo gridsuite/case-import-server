@@ -6,17 +6,15 @@
  */
 package org.gridsuite.caseimport.server;
 
+import com.powsybl.commons.datasource.DataSourceUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.gridsuite.caseimport.server.dto.AccessRightsAttributes;
 import org.gridsuite.caseimport.server.dto.ElementAttributes;
 import org.gridsuite.caseimport.server.dto.ImportedCase;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import com.powsybl.commons.datasource.DataSourceUtil;
-
 import java.util.Objects;
 import java.util.UUID;
-
 import static org.gridsuite.caseimport.server.CaseImportException.Type.UNKNOWN_CASE_SOURCE;
 
 /**
@@ -33,7 +31,7 @@ class CaseImportService {
 
     static final String CASE = "CASE";
 
-    public CaseImportService(CaseService caseService, DirectoryService directoryService, CaseImportConfig caseImportConfig) {
+    CaseImportService(CaseService caseService, DirectoryService directoryService, CaseImportConfig caseImportConfig) {
         this.caseService = caseService;
         this.directoryService = directoryService;
         this.caseImportConfig = caseImportConfig;
