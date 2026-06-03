@@ -21,7 +21,6 @@ import java.util.UUID;
 
 import static org.gridsuite.caseimport.server.CaseImportException.Type.INCORRECT_CASE_FILE;
 
-
 /**
  * @author Abdelsalem Hedhili <abdelsalem.hedhili at rte-france.com>
  */
