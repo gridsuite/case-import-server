@@ -8,7 +8,6 @@ package org.gridsuite.caseimport.server;
 
 import org.gridsuite.caseimport.server.dto.ElementAttributes;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
