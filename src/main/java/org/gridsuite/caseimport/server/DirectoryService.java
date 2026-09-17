@@ -8,13 +8,11 @@ package org.gridsuite.caseimport.server;
 
 import org.gridsuite.caseimport.server.dto.ElementAttributes;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
@@ -30,7 +28,7 @@ public class DirectoryService {
     private static final String ROOT_DIRECTORIES_SERVER_ROOT_PATH = DELIMITER + DIRECTORY_SERVER_API_VERSION + DELIMITER
             + "directories";
 
-    private final RestTemplate restTemplate;
+    private final RestClient restClient;
     private String directoryServerBaseUri;
 
     private static final String HEADER_USER_ID = "userId";
@@ -38,9 +36,9 @@ public class DirectoryService {
 
     public DirectoryService(
             @Value("${gridsuite.services.directory-server.base-uri:http://directory-server/}") String directoryServerBaseUri,
-            RestTemplateBuilder restTemplateBuilder) {
+            RestClient.Builder restClientBuilder) {
         this.directoryServerBaseUri = directoryServerBaseUri;
-        this.restTemplate = restTemplateBuilder.build();
+        this.restClient = restClientBuilder.build();
     }
 
     public void setDirectoryServerBaseUri(String directoryServerBaseUri) {
@@ -56,8 +54,12 @@ public class DirectoryService {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HEADER_USER_ID, userId);
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<ElementAttributes> httpEntity = new HttpEntity<>(elementAttributes, headers);
-        restTemplate
-                .exchange(directoryServerBaseUri + path, HttpMethod.POST, httpEntity, ElementAttributes.class);
+        restClient
+                .method(HttpMethod.POST)
+                .uri(directoryServerBaseUri + path)
+                .headers(httpHeaders -> httpHeaders.addAll(headers))
+                .body(elementAttributes)
+                .retrieve()
+                .toBodilessEntity();
     }
 }
