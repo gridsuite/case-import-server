@@ -59,7 +59,7 @@ public class CaseService {
                     .retrieve()
                     .body(UUID.class);
         } catch (HttpStatusCodeException e) {
-            if (e.getStatusCode().equals(HttpStatus.UNPROCESSABLE_ENTITY)) {
+            if (e.getStatusCode().isSameCodeAs(HttpStatus.UNPROCESSABLE_CONTENT)) {
                 throw new CaseImportException(INCORRECT_CASE_FILE, e.getMessage());
             }
             throw wrapRemoteError(e.getMessage(), e.getStatusCode());
