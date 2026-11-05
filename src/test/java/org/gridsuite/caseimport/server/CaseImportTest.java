@@ -93,14 +93,12 @@ class CaseImportTest {
         assertNull(outputDestination.receive(100, "caseimport.imported"));
     }
 
-    private void assertCaseImportedNotification(String caseName, String parentDirectory, String caseOrigin) throws Exception {
+    private void assertCaseImportedNotification(String caseOrigin) throws Exception {
         Message<byte[]> notification = outputDestination.receive(1000, "caseimport.imported");
         assertNotNull(notification);
         assertEquals(caseOrigin, notification.getHeaders().get("caseOrigin"));
         JsonNode payload = objectMapper.readTree(notification.getPayload());
-        assertEquals(CASE_UUID, payload.get("caseUuid").asText());
-        assertEquals(caseName, payload.get("caseName").asText());
-        assertEquals(parentDirectory, payload.get("parentDirectory").asText());
+        assertEquals(CASE_UUID, payload.asText());
     }
 
     @AfterAll
@@ -121,7 +119,7 @@ class CaseImportTest {
                     )
                     .andExpect(status().isCreated());
         }
-        assertCaseImportedNotification(TEST_CASE_NAME, DEFAULT_IMPORT_DIRECTORY, "default");
+        assertCaseImportedNotification("default");
     }
 
     @Test
@@ -188,7 +186,7 @@ class CaseImportTest {
                             jsonPath("caseName").value(caseName),
                             jsonPath("parentDirectory").value(CASE_ORIGIN_1_DIRECTORY));
         }
-        assertCaseImportedNotification(caseName, CASE_ORIGIN_1_DIRECTORY, CASE_ORIGIN_1);
+        assertCaseImportedNotification(CASE_ORIGIN_1);
     }
 
     @Test
@@ -208,6 +206,6 @@ class CaseImportTest {
                             jsonPath("caseName").value(TEST_CASE_NAME),
                             jsonPath("parentDirectory").value(CASE_ORIGIN_1_DIRECTORY));
         }
-        assertCaseImportedNotification(TEST_CASE_NAME, CASE_ORIGIN_1_DIRECTORY, CASE_ORIGIN_1);
+        assertCaseImportedNotification(CASE_ORIGIN_1);
     }
 }

@@ -66,7 +66,7 @@ class CaseImportService {
         importedCase.setCaseName(caseElementAttributes.getElementName());
         importedCase.setCaseUuid(caseElementAttributes.getElementUuid());
         importedCase.setParentDirectory(targetDirectory);
-        notificationService.emitCaseImported(importedCase, caseOrigin);
+        notificationService.emitCaseImported(caseUuid, caseOrigin);
         return importedCase;
     }
 }

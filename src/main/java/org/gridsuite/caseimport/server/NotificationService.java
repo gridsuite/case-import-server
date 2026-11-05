@@ -6,13 +6,14 @@
  */
 package org.gridsuite.caseimport.server;
 
-import org.gridsuite.caseimport.server.dto.ImportedCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 class NotificationService {
@@ -25,8 +26,8 @@ class NotificationService {
         this.caseImportPublisher = caseImportPublisher;
     }
 
-    void emitCaseImported(ImportedCase importedCase, String caseOrigin) {
-        Message<ImportedCase> message = MessageBuilder.withPayload(importedCase)
+    void emitCaseImported(UUID caseUuid, String caseOrigin) {
+        Message<UUID> message = MessageBuilder.withPayload(caseUuid)
                 .setHeader("caseOrigin", caseOrigin)
                 .build();
         LOGGER.debug("Sending message: {}", message);
