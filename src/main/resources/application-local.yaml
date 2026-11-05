@@ -1,6 +1,10 @@
 server:
   port: 5039
 
+spring:
+  rabbitmq:
+    addresses: localhost
+
 powsybl:
   services:
     case-server:
