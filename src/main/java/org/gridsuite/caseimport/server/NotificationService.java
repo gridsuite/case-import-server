@@ -8,8 +8,10 @@ package org.gridsuite.caseimport.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cloud.stream.binder.BinderException;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +33,10 @@ class NotificationService {
                 .setHeader("caseOrigin", caseOrigin)
                 .build();
         LOGGER.debug("Sending message: {}", message);
-        caseImportPublisher.send("publishCaseImported-out-0", message);
+        try {
+            caseImportPublisher.send("publishCaseImported-out-0", message);
+        } catch (MessagingException | BinderException | IllegalStateException e) {
+            LOGGER.error("Failed to publish case import notification for case {} with origin {}", caseUuid, caseOrigin, e);
+        }
     }
 }
