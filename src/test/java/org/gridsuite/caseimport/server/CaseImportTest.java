@@ -6,13 +6,19 @@
  */
 package org.gridsuite.caseimport.server;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.gridsuite.caseimport.server.utils.WireMockUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.stream.binder.test.OutputDestination;
+import org.springframework.cloud.stream.binder.test.TestChannelBinderConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.messaging.Message;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.ResourceUtils;
@@ -21,6 +27,8 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static org.gridsuite.caseimport.server.utils.WireMockUtils.CASE_UUID;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -31,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureMockMvc
 @SpringBootTest
+@Import(TestChannelBinderConfiguration.class)
 class CaseImportTest {
     private static final String TEST_FILE = "testCase.xiidm";
     private static final String TEST_CASE_NAME = "testCase";
@@ -53,6 +62,10 @@ class CaseImportTest {
     private DirectoryService directoryService;
     @Autowired
     private CaseService caseService;
+    @Autowired
+    private OutputDestination outputDestination;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @BeforeAll
     void initialize() {
@@ -75,6 +88,21 @@ class CaseImportTest {
         caseService.setBaseUri(wireMockServer.baseUrl());
     }
 
+    @AfterEach
+    void checkNoRemainingNotifications() {
+        assertNull(outputDestination.receive(100, "caseimport.imported"));
+    }
+
+    private void assertCaseImportedNotification(String caseName, String parentDirectory, String caseOrigin) throws Exception {
+        Message<byte[]> notification = outputDestination.receive(1000, "caseimport.imported");
+        assertNotNull(notification);
+        assertEquals(caseOrigin, notification.getHeaders().get("caseOrigin"));
+        JsonNode payload = objectMapper.readTree(notification.getPayload());
+        assertEquals(CASE_UUID, payload.get("caseUuid").asText());
+        assertEquals(caseName, payload.get("caseName").asText());
+        assertEquals(parentDirectory, payload.get("parentDirectory").asText());
+    }
+
     @AfterAll
     void cleanup() {
         wireMockServer.checkForUnmatchedRequests();
@@ -93,6 +121,7 @@ class CaseImportTest {
                     )
                     .andExpect(status().isCreated());
         }
+        assertCaseImportedNotification(TEST_CASE_NAME, DEFAULT_IMPORT_DIRECTORY, "default");
     }
 
     @Test
@@ -159,6 +188,7 @@ class CaseImportTest {
                             jsonPath("caseName").value(caseName),
                             jsonPath("parentDirectory").value(CASE_ORIGIN_1_DIRECTORY));
         }
+        assertCaseImportedNotification(caseName, CASE_ORIGIN_1_DIRECTORY, CASE_ORIGIN_1);
     }
 
     @Test
@@ -178,5 +208,6 @@ class CaseImportTest {
                             jsonPath("caseName").value(TEST_CASE_NAME),
                             jsonPath("parentDirectory").value(CASE_ORIGIN_1_DIRECTORY));
         }
+        assertCaseImportedNotification(TEST_CASE_NAME, CASE_ORIGIN_1_DIRECTORY, CASE_ORIGIN_1);
     }
 }
