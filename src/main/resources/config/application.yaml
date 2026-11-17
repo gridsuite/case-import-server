@@ -1,6 +1,12 @@
 spring:
   application:
     name: case-import-server
+  cloud:
+    stream:
+      bindings:
+        publishCaseImported-out-0:
+          destination: ${powsybl-ws.rabbitmq.destination.prefix:}caseimport.imported
+      output-bindings: publishCaseImported-out-0
 
 # mapping of target directories based on the origin of the case
 case-import-server:

@@ -29,12 +29,16 @@ class CaseImportService {
 
     private final CaseService caseService;
 
+    private final NotificationService notificationService;
+
     static final String CASE = "CASE";
 
-    CaseImportService(CaseService caseService, DirectoryService directoryService, CaseImportConfig caseImportConfig) {
+    CaseImportService(CaseService caseService, DirectoryService directoryService, CaseImportConfig caseImportConfig,
+                      NotificationService notificationService) {
         this.caseService = caseService;
         this.directoryService = directoryService;
         this.caseImportConfig = caseImportConfig;
+        this.notificationService = notificationService;
     }
 
     private String getTargetDirectory(String caseOrigin) {
@@ -62,6 +66,7 @@ class CaseImportService {
         importedCase.setCaseName(caseElementAttributes.getElementName());
         importedCase.setCaseUuid(caseElementAttributes.getElementUuid());
         importedCase.setParentDirectory(targetDirectory);
+        notificationService.emitCaseImported(caseUuid, caseOrigin);
         return importedCase;
     }
 }

@@ -17,6 +17,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.matching;
  */
 public class WireMockUtils {
 
+    public static final String CASE_UUID = "11111111-1111-1111-1111-111111111111";
+
     public static final String URI_CASE = "/v1/cases";
 
     public static final String URI_DIRECTORY_ELEMENTS = "/v1/directories/paths/elements";
@@ -44,7 +46,7 @@ public class WireMockUtils {
     public void stubImportCase(String filename) {
         wireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo(URI_CASE))
                 .withRequestBody(new ContainsPattern("filename=\"" + filename + "\""))
-                .willReturn(WireMock.ok())
+                .willReturn(WireMock.okJson("\"" + CASE_UUID + "\""))
         );
     }
 
